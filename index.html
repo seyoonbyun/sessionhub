@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SessionHub</title>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="app" style="min-height:100vh;display:flex;flex-direction:column;">
+
+    <!-- ===== PAGE 1: Intro ===== -->
+    <div id="pageIntro">
+      <header class="header">
+        <div class="header-left">
+          <a class="logo" onclick="showPage('intro')">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            SessionHub
+          </a>
+          <nav class="header-nav">
+            <a href="#">가능한 시간</a>
+            <span class="nav-separator">&gt;</span>
+            <a href="#" onclick="event.preventDefault(); showPage('myBookings');">나의 예약</a>
+          </nav>
+        </div>
+        <div class="header-right">
+          <svg class="help-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+      </header>
+
+      <main class="home-main">
+        <div class="home-form-container">
+          <h1 class="home-title">안녕하세요 SessionHub 입니다.</h1>
+          <p class="home-subtitle">예약자 정보를 알려주세요 ! :)</p>
+
+          <form class="home-form" id="homeForm">
+            <div class="form-group">
+              <label class="form-label">예약자 이름 <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input type="text" class="input" id="nameInput" placeholder="이름" required>
+                <button type="button" class="input-clear" id="nameClear">&times;</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">전화번호 <span class="required">*</span></label>
+              <input type="tel" class="input" id="phoneInput" placeholder="010-0000-0000" required style="border-color: var(--primary);">
+            </div>
+
+            <button type="submit" class="btn btn-primary home-btn">새로운 예약 만들기</button>
+          </form>
+
+          <div style="text-align:center;margin-top:24px;">
+            <p style="font-size:12px;color:var(--gray-400);margin-bottom:8px;">이미 예약이 있으신가요?</p>
+            <button class="btn btn-outline home-btn" onclick="showPage('myBookings')">내 예약 확인하기</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== PAGE 2: Booking ===== -->
+    <div id="pageBooking" class="hidden">
+      <div class="booking-page">
+        <header class="booking-topbar">
+          <button class="menu-btn" aria-label="메뉴">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="7" x2="20" y2="7"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="17" x2="20" y2="17"></line>
+            </svg>
+          </button>
+        </header>
+
+        <main class="booking-main">
+          <div class="booking-card">
+            <div class="booking-ribbon">
+              <span>Scheduling by</span>
+              <span>되는시간</span>
+            </div>
+
+            <!-- Left Column -->
+            <div class="booking-left" id="bookingLeft">
+              <button class="back-btn hidden" id="backBtn" onclick="goToSelect()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+              </button>
+              <div class="booking-label">예약자 이름</div>
+              <div class="booking-name" id="displayName"></div>
+              <div class="booking-info">
+                <div class="booking-info-row">
+                  <span class="booking-info-label">예약번호</span>
+                  <span class="booking-info-value" id="displayPhone">없음</span>
+                </div>
+                <div class="selected-datetime hidden" id="selectedDatetime">
+                  <svg class="dt-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+                  <div>
+                    <div id="dtDate"></div>
+                    <div class="dt-time" id="dtTime"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step: Select Date & Time -->
+            <div id="stepSelect" style="display:contents;">
+              <!-- Middle Column: Calendar -->
+              <div class="booking-middle">
+                <h2>날짜를 선택해 주세요.</h2>
+                <div class="calendar" id="calendar"></div>
+              </div>
+
+              <!-- Right Column: Time Slots -->
+              <div class="booking-right">
+                <div class="booking-right-header">
+                  <h2>시간 선택</h2>
+                  <p id="timeSlotDate">날짜를 선택하세요</p>
+                </div>
+                <div class="time-slots" id="timeSlots"></div>
+              </div>
+            </div>
+
+            <!-- Step: Form -->
+            <div class="booking-form-area hidden" id="stepForm">
+              <h2>예약자 정보 입력</h2>
+              <form class="booking-form" id="bookingForm">
+                <div class="form-group">
+                  <label class="form-label">서비스 명 <span class="required">*</span></label>
+                  <select class="select-input" id="serviceSelect" required>
+                    <option value="" disabled selected>서비스를 선택해주세요</option>
+                    <option value="a">상담 세션 A 코스</option>
+                    <option value="b">상담 세션 B 코스</option>
+                    <option value="c">상담 세션 C 코스</option>
+                    <option value="d">상담 세션 D 코스</option>
+                    <option value="e">상담 세션 E 코스</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">이용시간 <span class="required">*</span></label>
+                  <select class="select-input" id="durationSelect" required>
+                    <option value="" disabled selected>이용시간을 선택해주세요</option>
+                    <option value="30">30분</option>
+                    <option value="60">1시간</option>
+                    <option value="90">1시간 30분</option>
+                    <option value="120">2시간</option>
+                    <option value="150">2시간 30분</option>
+                    <option value="180">3시간</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">메모</label>
+                  <textarea class="textarea" id="memoInput" placeholder="전달하실 내용이 있다면 적어주세요."></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">이메일 <span class="required">*</span></label>
+                  <input type="email" class="input" id="emailInput" placeholder="이메일 주소를 입력해주세요" required>
+                </div>
+                <div style="padding-top:24px;">
+                  <button type="submit" class="btn btn-primary booking-submit">예약하기</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Step: Success -->
+            <div class="booking-success hidden" id="stepSuccess">
+              <div class="success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <h2 class="success-title">예약이 완료되었습니다!</h2>
+              <p class="success-desc">입력하신 이메일로 예약 확정 안내를 보내드렸습니다.<br>일정에 맞춰 참석해 주시기 바랍니다.</p>
+              <button class="btn btn-outline" style="height:44px;padding:0 32px;" onclick="showPage('myBookings')">나의 예약내역 바로보기</button>
+              <a href="#" style="display:inline-block;margin-top:12px;color:var(--gray-400);font-size:14px;text-decoration:underline;cursor:pointer;" onclick="showPage('intro')">홈으로 가기</a>
+            </div>
+          </div>
+
+          <div class="booking-help">
+            <span class="q-mark">?</span>
+            원하는 예약시간이 없으신가요?
+          </div>
+
+
+        </main>
+      </div>
+    </div>
+
+    <!-- ===== PAGE 3: My Bookings ===== -->
+    <div id="pageMyBookings" class="hidden">
+      <header class="header">
+        <div class="header-left">
+          <a class="logo" onclick="showPage('intro')">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            SessionHub
+          </a>
+          <nav class="header-nav">
+            <a href="#" onclick="event.preventDefault();">가능한 시간</a>
+            <span class="nav-separator">&gt;</span>
+            <a href="#" onclick="event.preventDefault(); showPage('myBookings');" class="nav-active">나의 예약</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="home-main">
+        <div class="my-booking-container">
+          <h1 class="home-title">나의 예약 확인</h1>
+          <p class="home-subtitle">예약번호를 입력해 주세요.</p>
+
+          <form class="home-form" id="lookupForm">
+            <div class="form-group">
+              <label class="form-label">예약번호 11자리 <span class="required">*</span></label>
+              <input type="tel" class="input" id="lookupPhone" placeholder="01000000000" required>
+            </div>
+            <button type="submit" class="btn btn-primary home-btn">예약 조회</button>
+          </form>
+
+          <!-- Lookup Results -->
+          <div id="lookupResults" class="hidden" style="margin-top:32px;">
+            <h2 style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--gray-900);">예약 내역</h2>
+            <div id="lookupList"></div>
+          </div>
+
+          <div id="lookupEmpty" class="hidden" style="margin-top:32px;text-align:center;color:var(--gray-500);">
+            해당 예약번호로 등록된 예약이 없습니다.
+            <div style="margin-top:20px;">
+              <p style="font-size:12px;color:var(--gray-400);margin-bottom:6px;">새로운 예약을 만드시겠어요?</p>
+              <a href="#" id="goToIntroBtn" style="font-size:14px;color:var(--primary);font-weight:600;text-decoration:none;">새로운 예약 만들기 !</a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
