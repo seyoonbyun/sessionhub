@@ -6,11 +6,40 @@ let userName = '';
 let userPhone = '';
 
 const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-let currentYear = 2026;
-let currentMonth = 2;
-let selectedDate = new Date(2026, 2, 11);
+const monthNames = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+];
+const today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
+let selectedDate = new Date(currentYear, currentMonth, today.getDate());
+while (isDateDisabled(selectedDate)) {
+  selectedDate.setDate(selectedDate.getDate() + 1);
+}
+currentYear = selectedDate.getFullYear();
+currentMonth = selectedDate.getMonth();
 let selectedTime = null;
-let busyTimes = []; // Google Calendar에서 가져온 바쁜 시간대
+let busyTimes = [];
+
+// 대한민국 공휴일 (MM-DD 고정 공휴일 + 연도별 음력 공휴일)
+const holidays = {
+  fixed: ['01-01', '03-01', '05-05', '06-06', '08-15', '10-03', '10-09', '12-25'],
+  '2025': ['01-28', '01-29', '01-30', '05-05', '05-06'],
+  '2026': ['02-16', '02-17', '02-18', '05-24', '09-24', '09-25', '09-26'],
+  '2027': ['02-05', '02-06', '02-07', '05-13', '10-13', '10-14', '10-15'],
+};
+
+function isHoliday(date) {
+  const mmdd = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const year = String(date.getFullYear());
+  return holidays.fixed.includes(mmdd) || (holidays[year] && holidays[year].includes(mmdd));
+}
+
+function isDateDisabled(date) {
+  const day = date.getDay();
+  return day === 0 || day === 6 || isHoliday(date);
+}
 
 const baseTimeSlots = [
   '10:00', '10:30', '11:00', '11:30',
@@ -74,15 +103,15 @@ function formatDate(d) {
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${dayNames[d.getDay()]}요일`;
 }
 
+function formatDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function renderCalendar() {
   const cal = document.getElementById('calendar');
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
-  const monthNames = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December',
-  ];
 
   let html = `
     <div class="calendar-header">
@@ -104,10 +133,12 @@ function renderCalendar() {
   const today = new Date();
   for (let d = 1; d <= daysInMonth; d++) {
     const thisDate = new Date(currentYear, currentMonth, d);
+    const disabled = isDateDisabled(thisDate);
     let cls = 'calendar-day';
-    if (selectedDate && selectedDate.getTime() === thisDate.getTime()) cls += ' selected';
+    if (disabled) cls += ' outside';
+    else if (selectedDate && selectedDate.getTime() === thisDate.getTime()) cls += ' selected';
     else if (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d) cls += ' today';
-    html += `<button class="${cls}" onclick="selectDate(${currentYear},${currentMonth},${d})">${d}</button>`;
+    html += `<button class="${cls}" ${disabled ? 'disabled' : `onclick="selectDate(${currentYear},${currentMonth},${d})"`}>${d}</button>`;
   }
 
   const totalCells = firstDay + daysInMonth;
@@ -143,7 +174,7 @@ function selectDate(y, m, d) {
 
 // ===== Google Calendar =====
 async function fetchBusyTimes(date) {
-  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const dateStr = formatDateStr(date);
   const timeMin = encodeURIComponent(`${dateStr}T00:00:00+09:00`);
   const timeMax = encodeURIComponent(`${dateStr}T23:59:59+09:00`);
   const calendarId = encodeURIComponent(CONFIG.GOOGLE_CALENDAR_ID);
@@ -300,9 +331,7 @@ document.getElementById('bookingForm').addEventListener('submit', async (e) => {
     duration: parseInt(document.getElementById('durationSelect').value) || null,
     memo: document.getElementById('memoInput').value || null,
     email: document.getElementById('emailInput').value,
-    booking_date: selectedDate
-      ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
-      : null,
+    booking_date: selectedDate ? formatDateStr(selectedDate) : null,
     booking_time: selectedTime || null,
   };
 
