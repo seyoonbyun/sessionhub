@@ -10,17 +10,6 @@ const monthNames = [
   'January','February','March','April','May','June',
   'July','August','September','October','November','December',
 ];
-const today = new Date();
-let currentYear = today.getFullYear();
-let currentMonth = today.getMonth();
-let selectedDate = new Date(currentYear, currentMonth, today.getDate());
-while (isDateDisabled(selectedDate)) {
-  selectedDate.setDate(selectedDate.getDate() + 1);
-}
-currentYear = selectedDate.getFullYear();
-currentMonth = selectedDate.getMonth();
-let selectedTime = null;
-let busyTimes = [];
 
 // 대한민국 공휴일 (MM-DD 고정 공휴일 + 연도별 음력 공휴일)
 const holidays = {
@@ -40,6 +29,18 @@ function isDateDisabled(date) {
   const day = date.getDay();
   return day === 0 || day === 6 || isHoliday(date);
 }
+
+const today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
+let selectedDate = new Date(currentYear, currentMonth, today.getDate());
+while (isDateDisabled(selectedDate)) {
+  selectedDate.setDate(selectedDate.getDate() + 1);
+}
+currentYear = selectedDate.getFullYear();
+currentMonth = selectedDate.getMonth();
+let selectedTime = null;
+let busyTimes = [];
 
 const baseTimeSlots = [
   '10:00', '10:30', '11:00', '11:30',
