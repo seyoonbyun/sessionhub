@@ -1,0 +1,6 @@
+{
+  "name": "sessionhub",
+  "scripts": {
+    "build": "node build.js"
+  }
+}
