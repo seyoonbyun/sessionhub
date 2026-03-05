@@ -65,13 +65,20 @@
     <div id="pageBooking" class="hidden">
       <div class="booking-page">
         <header class="booking-topbar">
-          <button class="menu-btn" aria-label="메뉴">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="4" y1="7" x2="20" y2="7"></line>
-              <line x1="4" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="17" x2="20" y2="17"></line>
-            </svg>
-          </button>
+          <div class="menu-wrapper">
+            <button class="menu-btn" aria-label="메뉴" onclick="toggleMenu()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="7" x2="20" y2="7"></line>
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="17" x2="20" y2="17"></line>
+              </svg>
+            </button>
+            <div class="menu-dropdown hidden" id="menuDropdown">
+              <button class="menu-item" onclick="closeMenu()">홈화면으로</button>
+              <button class="menu-item" onclick="closeMenu()">캘린더에서 보기</button>
+              <button class="menu-item" onclick="closeMenu(); showPage('myBookings');">내 예약 확인</button>
+            </div>
+          </div>
         </header>
 
         <main class="booking-main">

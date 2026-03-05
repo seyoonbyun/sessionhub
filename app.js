@@ -435,6 +435,18 @@ document.getElementById('lookupForm').addEventListener('submit', async (e) => {
   `).join('');
 });
 
+// ===== Menu =====
+function toggleMenu() {
+  document.getElementById('menuDropdown').classList.toggle('hidden');
+}
+function closeMenu() {
+  document.getElementById('menuDropdown').classList.add('hidden');
+}
+document.addEventListener('click', (e) => {
+  const wrapper = document.querySelector('.menu-wrapper');
+  if (wrapper && !wrapper.contains(e.target)) closeMenu();
+});
+
 // ===== Init =====
 document.getElementById('goToIntroBtn').addEventListener('click', () => {
   showPage('intro');
