@@ -793,7 +793,9 @@ a { text-decoration: none; color: inherit; }
     width: 100% !important;
   }
   .booking-left { border-right: none; border-bottom: 1px solid var(--gray-100); }
-  .booking-middle { border-right: none; border-bottom: 1px solid var(--gray-100); }
+  .booking-middle { border-right: none; border-bottom: 1px solid var(--gray-100); padding: 28px 16px; }
+  .calendar { max-width: 100%; }
+  .calendar-day { width: 36px; height: 36px; font-size: 14px; }
 }
 
 /* ========= NAV ACTIVE ========= */
