@@ -242,8 +242,8 @@ function renderTimeSlots() {
       return `
         <div class="time-slot-row">
           <button class="time-slot-btn ${isSelected ? 'selected' : ''}" onclick="selectTime('${time}')">${time}</button>
-          <div class="time-slot-next ${isSelected ? 'visible' : ''}">
-            <button onclick="goToForm()">다음</button>
+          <div class="time-slot-next visible ${isSelected ? '' : 'placeholder'}">
+            <button ${isSelected ? 'onclick="goToForm()"' : 'disabled'}>${isSelected ? '다음' : '예약'}</button>
           </div>
         </div>`;
     })

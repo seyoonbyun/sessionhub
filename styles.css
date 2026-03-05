@@ -496,6 +496,14 @@ a { text-decoration: none; color: inherit; }
   opacity: 0.6;
 }
 .time-slot-next.unavailable button:hover { background: var(--gray-50); }
+.time-slot-next.placeholder button {
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--gray-200);
+  cursor: default;
+  box-shadow: none;
+  font-weight: 500;
+}
 
 /* Form Step */
 .booking-form-area {
